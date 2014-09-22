@@ -1,5 +1,3 @@
 require "xlsx_importer/version"
-
-module XlsxImporter
-  # Your code goes here...
-end
+require "extensions/hash.rb"
+require "xlsx_importer/xlsx_importer"
