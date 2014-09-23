@@ -22,9 +22,11 @@ Or install it yourself as:
 
 ## Usage
 
+```ruby
     > XlsxImporter.process('/tmp/people.xlsx', options = {})
      => [ {:first_name=>"Dan", :last_name=>"McAllister"},
           {:first_name=>"Lucy", :last_name=>"Laweless"} ]
+```
 
 ### Options
 
@@ -44,6 +46,24 @@ A few options from Smarter CVS are supported, a few more were added.
 | :remove_values_matching   | nil     | removes key/value pairs if value matches given regular expressions
 | :header_row               | 1       | row number with the headers
 | :date_keys                | nil     | Array with the keys of date fields to perform DB compatible validation
+
+### Example
+
+```ruby
+  result = XlsxImporter.process('tmp/test.xlsx', {
+      :key_mapping_hash => {
+          :name => :full_name,
+          :date_of_creation => :created_at,
+          :date_of_termination => :deleted_at,
+      },
+      :date_keys => [:created_at, :deleted_at],
+      :remove_unmapped_keys => true,
+      :strip_chars_from_headers => /[\/\(\)]/,
+      :remove_values_matching => /^[\.\-]$/,
+      :sheet => 1,
+      :header_row => 3
+  })
+```
 
 ## Contributing
 
