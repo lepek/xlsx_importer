@@ -1,6 +1,10 @@
 # XlsxImporter
 
-TODO: Write a gem description
+I really like [Smarter CSV](https://github.com/tilo/smarter_csv) but as MS Excel cannot export CSV files in unicode,
+I need to import the spreadsheet directly to preserve the unicode characters.
+
+XlsxImporter is a port from Smarter CSV with a few specific options for spreadsheets import. It uses [SimpleXlsxReader](https://github.com/woahdae/simple_xlsx_reader)
+to read the MS Excel xlsx file. It only support xlsx files.
 
 ## Installation
 
@@ -18,7 +22,28 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+    > XlsxImporter.process('/tmp/people.xlsx', options = {})
+     => [ {:first_name=>"Dan", :last_name=>"McAllister"},
+          {:first_name=>"Lucy", :last_name=>"Laweless"} ]
+
+### Options
+
+A few options from Smarter CVS are supported, a few more were added.
+
+| Option                    | Default | Explanation
+|---------------------------|---------|-----------------------------------------------------------------------------
+| :key_mapping_hash         | nil     | a hash which maps headers from the spreadsheet to keys in the result hash
+| :remove_unmapped_keys     | false   | when using :key_mapping option, should non-mapped keys / columns be removed?
+| :sheet                    | 0       | the number of the sheet inside the workbook to parse
+| :strip_whitespace         | true    | remove whitespace before/after values and headers
+| :downcase_header          | true    | downcase all column headers
+| :strip_chars_from_headers | nil     | RegExp to remove extraneous characters from the header line
+| :remove_empty_hashes      | true    | remove / ignore any hashes which don't have any key/value pairs
+| :remove_empty_values      | true    | remove values which have nil or empty strings as values
+| :remove_zero_values       | false   | remove values which have a numeric value equal to zero / 0
+| :remove_values_matching   | nil     | removes key/value pairs if value matches given regular expressions
+| :header_row               | 1       | row number with the headers
+| :date_keys                | nil     | Array with the keys of date fields to perform DB compatible validation
 
 ## Contributing
 
