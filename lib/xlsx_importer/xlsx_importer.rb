@@ -7,7 +7,7 @@ module XlsxImporter
       :key_mapping_hash => nil,
       :remove_unmapped_keys => false,
       :headers_in_file => true,
-      :sheet => 1,
+      :sheet => 0,
       :strip_whitespace => true,
       :downcase_header => true,
       :strip_chars_from_headers => nil,
@@ -15,7 +15,8 @@ module XlsxImporter
       :remove_empty_values => true,
       :remove_zero_values => false,
       :remove_values_matching => nil,
-      :header_row => 3,
+      :header_row => 1,
+      :date_keys => nil,
     }
     options = default_options.merge(options)
 
@@ -43,15 +44,18 @@ module XlsxImporter
       rows.each do |row|
         line += 1
 
-        data = row
-        data.map!{|x| x.strip if x.respond_to?(:strip)}  if options[:strip_whitespace]
+        row.map!{|x| x.respond_to?(:strip) ? x.strip : x }  if options[:strip_whitespace]
 
-        hash = Hash.zip(headers,data)
+        hash = Hash.zip(headers,row)
 
         hash.delete(nil); hash.delete('');
-        hash.delete_if{|k,v| v.nil? || v =~ /^\s*$/}  if options[:remove_empty_values]
-        hash.delete_if{|k,v| ! v.nil? && v =~ /^(\d+|\d+\.\d+)$/ && v.to_f == 0} if options[:remove_zero_values]   # values are typically Strings!
-        hash.delete_if{|k,v| v =~ options[:remove_values_matching]} if options[:remove_values_matching]
+        hash.delete_if {|k,v| v.nil? || v =~ /^\s*$/}  if options[:remove_empty_values]
+        hash.delete_if {|k,v| !v.nil? && v =~ /^(\d+|\d+\.\d+)$/ && v.to_f == 0} if options[:remove_zero_values]   # values are typically Strings!
+        hash.delete_if {|k,v| v =~ options[:remove_values_matching]} if options[:remove_values_matching]
+
+        options[:date_keys].map do |x|
+            hash[x] = nil if hash.has_key?(x) && self.date_validation(hash[x]).nil?
+        end if options[:date_keys].present? && options[:date_keys].class == Array && options[:date_keys].size > 0
 
         next if hash.empty? if options[:remove_empty_hashes]
 
@@ -65,4 +69,14 @@ module XlsxImporter
     return result
 
   end
+
+  def self.date_validation(date)
+    date = Date.parse(date) if date.class == 'String'
+    date.strftime('%Y-%m-%d') =~ /^([1-3][0-9]{3,3})-(0?[1-9]|1[0-2])-(0?[1-9]|[1-2][1-9]|3[0-1])$/
+  rescue
+    return nil
+  end
+
+
+
 end
