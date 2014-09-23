@@ -6,7 +6,6 @@ module XlsxImporter
     default_options = {
       :key_mapping_hash => nil,
       :remove_unmapped_keys => false,
-      :headers_in_file => true,
       :sheet => 0,
       :strip_whitespace => true,
       :downcase_header => true,
@@ -28,9 +27,9 @@ module XlsxImporter
 
     headers = sheet.rows[options[:header_row] - 1]
     headers.map!{|x| x.gsub(options[:strip_chars_from_headers], '')} if options[:strip_chars_from_headers]
-    headers.map!{|x| x.strip if x.respond_to?(:strip)}  if options[:strip_whitespace]
+    headers.map!{|x| x.respond_to?(:strip) ? x.strip : x}  if options[:strip_whitespace]
     headers.map!{|x| x.gsub(/\s+/,'_')}
-    headers.map!{|x| x.downcase if x.respond_to?(:downcase) } if options[:downcase_header]
+    headers.map!{|x| x.respond_to?(:downcase) ? x.downcase : x } if options[:downcase_header]
     headers.map!{|x| x.to_sym }
 
     key_mapping_hash = options[:key_mapping_hash]
